@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel de administración</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=3">
+<link rel="stylesheet" href="css/admin.css?v=3">
+</head>
+<body class="adm">
+
+<p id="boot" class="boot">Cargando…</p>
+
+<!-- Configuración inicial (una sola vez, solo en el sitio publicado en GitHub) -->
+<main id="setup" class="lg" hidden>
+  <form class="lg-box wide" id="suf">
+    <p class="brand">Configuración inicial</p>
+    <h1>Conecta el panel con GitHub</h1>
+    <p class="mut">Se hace una sola vez. El panel guarda los cambios en este mismo repositorio, así el sitio sigue siendo gratis. Tu token queda cifrado con la contraseña que elijas abajo.</p>
+    <ol class="pasos">
+      <li>Abre <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> e inicia sesión.</li>
+      <li>Ponle un nombre al token y elige la expiración más larga que te deje.</li>
+      <li>En <b>Repository access</b> elige <b>Only select repositories</b> y marca solo este repositorio.</li>
+      <li>En <b>Permissions</b>, abre <b>Repository permissions</b> y pon <b>Contents</b> en <b>Read and write</b>.</li>
+      <li>Pulsa <b>Generate token</b>, copia el token y pégalo aquí abajo.</li>
+    </ol>
+    <div class="two">
+      <div class="fld"><label for="su-o">Usuario de GitHub</label><input id="su-o" name="owner" required autocomplete="off" autocapitalize="none"></div>
+      <div class="fld"><label for="su-r">Nombre del repositorio</label><input id="su-r" name="repo" required autocomplete="off" autocapitalize="none"></div>
+    </div>
+    <div class="fld"><label for="su-t">Token de GitHub</label><input id="su-t" name="token" type="password" required autocomplete="off" placeholder="github_pat_..."></div>
+    <div class="fld"><label for="su-p">Contraseña del panel (mínimo 10 caracteres)</label><input id="su-p" name="pw" type="password" minlength="10" required autocomplete="new-password"><span class="mut small">Usa una contraseña larga y que no uses en otro sitio: protege el token.</span></div>
+    <div class="fld"><label for="su-r2">Repite la contraseña</label><input id="su-r2" name="pw2" type="password" minlength="10" required autocomplete="new-password"></div>
+    <p class="err" id="suerr" role="alert"></p>
+    <button class="btn" id="sugo" type="submit" style="width:100%">Guardar configuración</button>
+    <p style="margin-top:1rem;text-align:center"><a class="link" href="index.html">Volver a la tienda</a></p>
+  </form>
+</main>
+
+<!-- Ingreso -->
+<main id="login" class="lg" hidden>
+  <form class="lg-box" id="lf">
+    <p class="brand" id="lBrand">Joyería</p>
+    <h1>Panel de administración</h1>
+    <p class="mut">Ingresa con tu contraseña para cambiar fotos, precios y cantidades disponibles.</p>
+    <p class="demo" id="lDemo" hidden>Vista previa local: la contraseña es <b>demo1234</b>.</p>
+    <div class="fld">
+      <label for="pw">Contraseña</label>
+      <div class="pwbox">
+        <input id="pw" type="password" autocomplete="current-password" required>
+        <button class="link" type="button" id="pwSee">Mostrar</button>
+      </div>
+    </div>
+    <p class="err" id="lerr" role="alert"></p>
+    <button class="btn" id="lgo" type="submit" style="width:100%">Ingresar</button>
+    <p style="margin-top:1rem;text-align:center"><a class="link" href="index.html">Volver a la tienda</a></p>
+  </form>
+</main>
+
+<!-- Panel -->
+<div id="app" hidden>
+  <header class="bar">
+    <div class="bar-in">
+      <p class="brand" id="aBrand">Joyería</p>
+      <span class="chip">Panel</span>
+      <div class="bar-act">
+        <a class="btn ghost sm" href="index.html" target="_blank" rel="noopener">Ver tienda</a>
+        <button class="btn gold sm" type="button" id="logout">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="avisos"></div>
+    <p class="nota" id="nota" hidden>Cuando guardas, GitHub publica el cambio en la tienda en 1 o 2 minutos. Aquí siempre ves lo más reciente.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabP" aria-selected="true" aria-controls="tProd" type="button">Productos</button>
+      <button class="tab" role="tab" id="tabA" aria-selected="false" aria-controls="tAj" type="button">Ajustes</button>
+    </div>
+
+    <!-- Productos -->
+    <section id="tProd" role="tabpanel" aria-labelledby="tabP">
+      <div class="tb">
+        <button class="btn gold" type="button" id="nuevo">Agregar joya</button>
+        <label class="grow"><span class="sr">Buscar</span><input id="fq" type="search" placeholder="Buscar por nombre"></label>
+        <label><span class="sr">Categoría</span><select id="fc"><option value="">Todas las categorías</option></select></label>
+      </div>
+      <p class="mut stats" id="stats"></p>
+      <ul class="list" id="list"></ul>
+    </section>
+
+    <!-- Ajustes -->
+    <section id="tAj" role="tabpanel" aria-labelledby="tabA" hidden>
+      <form class="card-a" id="sf">
+        <h2>Datos de la tienda</h2>
+        <div class="fld"><label for="s-tienda">Nombre de la tienda</label><input id="s-tienda" name="tienda" maxlength="40" required></div>
+        <div class="fld"><label for="s-wa">WhatsApp donde recibes los pedidos</label><input id="s-wa" name="whatsapp" type="tel" inputmode="tel" placeholder="3001234567"><span class="mut small">Escribe solo los 10 dígitos de tu celular. Los pedidos llegan a este número.</span></div>
+        <div class="fld"><label for="s-anuncio">Mensaje de la franja superior</label><input id="s-anuncio" name="anuncio" maxlength="120"></div>
+        <div class="fld"><label for="s-ht">Título de la portada</label><input id="s-ht" name="heroTitulo" maxlength="120"></div>
+        <div class="fld"><label for="s-hp">Texto de la portada</label><textarea id="s-hp" name="heroTexto" maxlength="240" rows="3"></textarea></div>
+        <div class="fld"><label for="s-g">Texto de la garantía</label><textarea id="s-g" name="garantia" maxlength="1200" rows="5"></textarea></div>
+        <p class="err" id="serr" role="alert"></p>
+        <button class="btn" type="submit">Guardar ajustes</button>
+      </form>
+
+      <form class="card-a" id="pf">
+        <h2>Cambiar contraseña</h2>
+        <div class="fld"><label for="p-a">Contraseña actual</label><input id="p-a" type="password" autocomplete="current-password" required></div>
+        <div class="fld"><label for="p-n">Contraseña nueva (mínimo 10 caracteres)</label><input id="p-n" type="password" autocomplete="new-password" minlength="10" required></div>
+        <div class="fld"><label for="p-r">Repite la contraseña nueva</label><input id="p-r" type="password" autocomplete="new-password" minlength="10" required></div>
+        <p class="err" id="perr" role="alert"></p>
+        <button class="btn" type="submit">Cambiar contraseña</button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<!-- Editor de joya -->
+<dialog id="ed" aria-labelledby="edT">
+  <form class="box" id="ef">
+    <div class="d-head"><h2 id="edT">Agregar joya</h2><button class="x" type="button" id="edX" aria-label="Cerrar">&times;</button></div>
+
+    <fieldset class="fotos">
+      <legend>Fotos (hasta 4)</legend>
+      <div class="slots" id="slots">
+        <div class="slot" data-i="0"><label class="slot-box"><img alt="Foto principal" width="120" height="120"><input type="file" accept="image/*" id="e-file" aria-label="Foto principal"></label><span class="slot-t">Principal</span><button class="link" type="button" data-q="0" hidden>Quitar</button></div>
+        <div class="slot" data-i="1"><label class="slot-box"><img alt="Foto 2" width="120" height="120"><input type="file" accept="image/*" aria-label="Foto 2"></label><span class="slot-t">Foto 2</span><button class="link" type="button" data-q="1" hidden>Quitar</button></div>
+        <div class="slot" data-i="2"><label class="slot-box"><img alt="Foto 3" width="120" height="120"><input type="file" accept="image/*" aria-label="Foto 3"></label><span class="slot-t">Foto 3</span><button class="link" type="button" data-q="2" hidden>Quitar</button></div>
+        <div class="slot" data-i="3"><label class="slot-box"><img alt="Foto 4" width="120" height="120"><input type="file" accept="image/*" aria-label="Foto 4"></label><span class="slot-t">Foto 4</span><button class="link" type="button" data-q="3" hidden>Quitar</button></div>
+      </div>
+      <p class="mut small">La primera es la que se ve en el catálogo; las otras salen como miniaturas al abrir la joya. Si no subes foto, se muestra un dibujo dorado.</p>
+    </fieldset>
+
+    <div class="two">
+      <div class="fld"><label for="e-cat">Categoría</label><select id="e-cat" name="cat" required></select></div>
+      <div class="fld" id="e-subw"><label for="e-sub">Tipo</label><select id="e-sub" name="sub"></select></div>
+    </div>
+    <div class="fld"><label for="e-nombre">Nombre</label><input id="e-nombre" name="nombre" maxlength="100" required placeholder="Ej. Cadena Gucci Lisa"></div>
+    <div class="fld"><label for="e-mat">Material</label><input id="e-mat" name="material" maxlength="60" placeholder="Laminado oro 18k"></div>
+
+    <div class="tres">
+      <div class="fld"><label for="e-peso">Peso (gr)</label><input id="e-peso" name="peso" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" autocomplete="off"></div>
+      <div class="fld"><label for="e-gro">Grosor (mm)</label><input id="e-gro" name="grosor" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" autocomplete="off"></div>
+      <div class="fld"><label for="e-lar" id="e-larL">Largo (cm)</label><input id="e-lar" name="largo" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" autocomplete="off"></div>
+    </div>
+
+    <div class="two">
+      <div class="fld"><label for="e-precio">Precio (COP)</label><input id="e-precio" name="precio" type="number" min="1" step="1" inputmode="numeric" required></div>
+      <div class="fld"><label for="e-ant">Precio anterior (opcional)</label><input id="e-ant" name="anterior" type="number" min="0" step="1" inputmode="numeric"><span class="mut small">Si es mayor al precio, se muestra tachado como oferta.</span></div>
+    </div>
+
+    <div class="fld" id="e-stockw"><label for="e-stock">Cantidad disponible</label><input id="e-stock" name="stock" type="number" min="0" step="1" inputmode="numeric" value="0"></div>
+
+    <div class="fld" id="e-tallasw">
+      <label>Tallas disponibles</label>
+      <div id="tallas"></div>
+      <button class="btn line sm" type="button" id="addTalla" style="justify-self:start">Agregar talla</button>
+    </div>
+
+    <div class="fld"><label for="e-desc">Descripción (opcional)</label><textarea id="e-desc" name="desc" maxlength="600" rows="3"></textarea></div>
+    <label class="chk"><input type="checkbox" name="activo" id="e-activo" checked> Mostrar en la tienda</label>
+
+    <p class="pv"><span class="mut small">Así se verá el nombre completo:</span><br><b id="e-pv"></b></p>
+    <p class="err" id="eerr" role="alert"></p>
+    <div class="acts">
+      <button class="btn line" type="button" id="edC">Cancelar</button>
+      <button class="btn gold" type="submit" id="edS">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="js/seed.js?v=1"></script>
+<script src="js/data.js?v=1"></script>
+<script src="js/admin.js?v=1"></script>
+</body>
+</html>
