@@ -10,9 +10,12 @@
   "largo": 45,
   "tallas": [],
   "stock": 6,
-  "precio": 69900,
-  "anterior": 79900,
-  "img": "",
+  "precio": 200000,
+  "anterior": 0,
+  "img": "uploads/f6c35fcfe71a4d838.jpg",
+  "fotos": [
+   "uploads/f05a97ba5ccd9efb5.jpg"
+  ],
   "desc": "Eslabón diamantado, liviana y brillante.",
   "activo": true,
   "creado": 1793201830
